@@ -32,3 +32,6 @@ test('service origins reject credential exfiltration URLs and allow keyless loop
   }
 });
 
+test('a protocol option is rejected for providers that do not declare it',()=>{
+  expect(()=>normalizeApiService({id:'x',name:'X',providerId:'openai',baseUrl:'https://api.openai.com/v1',model:'gpt-5.6-luna',apiKey:'k',options:{protocol:'chat'}})).toThrow('未知选项');
+});

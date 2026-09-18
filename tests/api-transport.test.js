@@ -289,6 +289,15 @@ test('concurrent callers share a probe while cancellation is isolated until its 
   await new Promise(resolve=>setTimeout(resolve,0));loneController.abort();await expect(lone).rejects.toHaveProperty('name','AbortError');expect(loneProbeAborted).toBe(true);expect(loneFormal).toBe(0);
 });
 
+test('an unfinished or unparsable capability probe downgrades to json_object',async()=>{
+  const cases=[['degraded-probe-unfinished',{finish_reason:'length',message:{content:''}}],['degraded-probe-unparsable',{finish_reason:'stop',message:{content:'not json'}}]];
+  for(const [model,probe] of cases){
+    const bodies=[];rawFetch(async(_url,init)=>{const body=requestBody(init);bodies.push(body);if(capabilityFormat(body))return Response.json({choices:[probe]});return Response.json({choices:[{finish_reason:'stop',message:{content:'{"value":"degraded"}'}}]});});
+    expect(await performProviderRequest(service('openai-compatible','https://degraded-probe.example.test/v1',model),{},'Explain.',schema)).toEqual({value:'degraded'});
+    expect(bodies).toHaveLength(2);expect(bodies[1].response_format).toEqual({type:'json_object'});
+  }
+});
+
 test('invalid_schema after a valid probe is a request failure, not evidence for json_object downgrade',async()=>{
   const bodies=[];rawFetch(async(_url,init)=>{const body=requestBody(init);bodies.push(body);if(capabilityFormat(body))return capabilitySuccess(body);return Response.json({error:{type:'invalid_request_error',code:'invalid_schema'}},{status:400});});
   await expect(performProviderRequest(service('openai-compatible','https://formal-invalid-schema.example.test/v1','formal-invalid-schema-model'),{},'Explain.',schema)).rejects.toBeDefined();
