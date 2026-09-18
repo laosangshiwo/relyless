@@ -280,7 +280,7 @@ test('compatible JSON API serves provider checks, assistance, support, and class
   try{
     globalThis.fetch=fetchBefore;
     await send({type:'STATE_PATCH',patch:{providerKind:'api',apiServices:[{id:'loopback',name:'Loopback',baseUrl:'http://127.0.0.1:'+server.port,model:'deepseek-flash',apiKey:'loopback-only-key'}],activeApiServiceId:'loopback'}},extensionSender);
-    expect(await send({type:'API_MODELS_LIST',service:{...stored.settings.apiServices[0],model:''}},extensionSender)).toEqual({models:[{id:'deepseek-flash',name:'DeepSeek Flash'}]});
+    expect(await send({type:'API_MODELS_LIST',service:{...stored.settings.apiServices[0],model:''}},extensionSender)).toEqual({models:[{id:'deepseek-flash',name:'DeepSeek Flash',endpoints:[]}]});
     const beforeWords=structuredClone(stored.words),beforeUsage=structuredClone(stored.supportUsage);
     expect(await send({type:'PROVIDER_TEST'},extensionSender)).toEqual({hint:'a structure for finding database records'});
     expect(stored.words).toEqual(beforeWords);expect(stored.supportUsage).toEqual(beforeUsage);

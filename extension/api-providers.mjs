@@ -39,6 +39,7 @@ export const API_PROVIDERS = [
   {id:'alibaba',name:'Alibaba Cloud',protocol:'chat',baseUrl:'https://dashscope.aliyuncs.com/compatible-mode/v1',defaultModel:'qwen3.8-flash',apiKeyUrl:'',keyOptional:false,fields:[]},
   {id:'moonshotai',name:'Moonshot AI',protocol:'chat',baseUrl:'https://api.moonshot.ai/v1',defaultModel:'kimi-k2.6',apiKeyUrl:'',keyOptional:false,fields:[]},
   {id:'huggingface',name:'Hugging Face',protocol:'chat',baseUrl:'https://router.huggingface.co/v1',defaultModel:'Qwen/Qwen2.5-7B-Instruct-1M',apiKeyUrl:'',keyOptional:false,fields:[]},
+  {id:'commandcode',name:'CommandCode',protocol:'chat',baseUrl:'https://api.commandcode.ai/provider/v1',defaultModel:'poolside/laguna-s-2.1-free',apiKeyUrl:'',keyOptional:false,fields:[{key:'protocol',label:'协议',type:'select',defaultValue:'chat',options:[{value:'chat',label:'Chat Completions'},{value:'responses',label:'Responses API'},{value:'anthropic',label:'Anthropic Messages'}]}]},
 ];
 
 const providersById = new Map(API_PROVIDERS.map(provider => [provider.id,provider]));

@@ -144,6 +144,15 @@ test('Responses protocols distinguish reasoning-capable and non-reasoning models
   for(const [providerId,model,expected] of cases){let sent;globalThis.fetch=async(_url,init)=>{sent=JSON.parse(init.body);return Response.json({status:'completed',output_text:'{"value":"ok"}'});};await performProviderRequest(service(providerId,'https://api.example.test/v1',model),{},'Explain.',schema);expect(sent.reasoning).toEqual(expected.reasoning);}
 });
 
+test('CommandCode disables reasoning on its Responses route and leaves its chat route alone',async()=>{
+  let sent;globalThis.fetch=async(_url,init)=>{sent=JSON.parse(init.body);return sent.messages?Response.json({choices:[{finish_reason:'stop',message:{content:'{"value":"ok"}'}}]}):Response.json({status:'completed',output_text:'{"value":"ok"}'});};
+  const base='https://api.commandcode.ai/provider/v1',model='deepseek/deepseek-v4.1-flash';
+  await performProviderRequest(service('commandcode',base,model),{},'Explain.',schema);
+  expect(sent.reasoning).toBeUndefined();
+  await performProviderRequest({...service('commandcode',base,model),options:{protocol:'responses'}},{},'Explain.',schema);
+  expect(sent.reasoning).toEqual({effort:'none'});
+});
+
 test('Gemini sends budget zero only for models that can actually turn thinking off',async()=>{
   let sent;globalThis.fetch=async(_url,init)=>{sent=JSON.parse(init.body);return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'{"value":"ok"}'}]}}]});};
   await performProviderRequest(service('google','https://generativelanguage.googleapis.com/v1beta','gemini-2.5-flash-lite'),{},'Explain.',schema);
